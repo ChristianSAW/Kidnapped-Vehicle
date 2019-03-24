@@ -34,18 +34,19 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   num_particles = 100;  // TODO: Set the number of particles
   
   // std = [sig_x, sig_y, sig_theta]
-  std::default_random_engine gen           // random generator
+  std::default_random_engine gen;           // random generator
   normal_distribution<double> dist_x(x, std[0]);
   normal_distribution<double> dist_y(y, std[1]);
   normal_distribution<double> dist_theta(theta, std[2]);
    
   // POPULATE PARTICLES VECTOR
+  // Determine later if we want to normalize weights
   for(int i = 0; i < num_particles; ++i) {
-    particle p; 
+    Particle p; 
     p.x = dist_x(gen);
     p.y = dist_y(gen);
     p.theta = dist_theta(gen);
-    p.w = 1;
+    p.weight = 1;
     particles.push_back(p);
   }
   
@@ -61,12 +62,28 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
    *  http://www.cplusplus.com/reference/random/default_random_engine/
    */
-  // std_pos = [x, y, theta]
-    double Xf = std_pos[0] + (velocity/yaw_rate)*(sin(std_pos[2] + yaw_rate*delta_t)-sin(std_pos[2]));
-    double Yf = std_pos[1] + (velocity/yaw_rate)*(cos(std_pos[2]) - cos(std_pos[2] + yaw_rate*delta_t));
-    double Thetaf = std_pos[2] + yaw_rate*delta_t;
+  // std_pos = [x_var, y_var, theta_var]; process noise.
   
+  // initializations:
+  double Xf, Yf, Thetaf;
+  std::default_random_engine gen;           // random generator
   
+  // Prediction step for each particle i in particles
+  for(Particle i : particles) {
+    Xf = i.x + (velocity/yaw_rate)*(sin(i.theta + yaw_rate*delta_t)-sin(i.theta));
+    Yf = i.y + (velocity/yaw_rate)*(cos(i.theta) - cos(i.theta + yaw_rate*delta_t));
+    Thetaf = i.theta + yaw_rate*delta_t;
+  
+    // Add noise
+    normal_distribution<double> dist_x(Xf, std_pos[0]);
+    normal_distribution<double> dist_y(Yf, std_pos[1]);
+    normal_distribution<double> dist_theta(Thetaf, std_pos[2]);
+  
+    // POPULATE PARTICLES VECTOR
+    i.x = dist_x(gen);
+    i.y = dist_y(gen);
+    i.theta = dist_theta(gen);
+  }
   
 }
 
