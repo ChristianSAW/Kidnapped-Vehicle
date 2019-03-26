@@ -83,6 +83,7 @@ class ParticleFilter {
    * resample Resamples from the updated set of particles to form
    *   the new set of particles.
    */
+
   void resample();
 
   /**

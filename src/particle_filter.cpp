@@ -114,6 +114,10 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   }
 }
 
+bool comp(LandmarkObs a, LandmarkObs b) {
+  return a.id < b.id;
+}
+
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
                                    const vector<LandmarkObs> &observations, 
                                    const Map &map_landmarks) {
@@ -130,6 +134,67 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
    *   and the following is a good resource for the actual equation to implement
    *   (look at equation 3.33) http://planning.cs.uiuc.edu/node99.html
    */
+  //* Notes:
+  // [1] map has landmarks in order of id, so no need to sort landmarks in prediction vector by 
+  // id as you populate in order of increasing id. Only need to sort observations vector.
+  // [2] std_landmark = [sig_x, sig_y]
+  
+  // Variables
+  vector<LandmarkObs> predicted;
+  double Xr;
+  double Yr;
+  double Xob, Yob, Xpr, Ypr;
+  double SigX = std_landmark[0];
+  double SigY = std_landmark[1];
+  
+  // need to make a copy of observations so we can modify it. 
+  // alternatively, we could 1) change dataAssociation to change predicted and not observations id.
+  // Problem is that we cant output anything so we have to change observations. 
+  // 2) swich predicted and observations input into dataAssociation.
+  vector<LandmarkObs> observationsT = observations; 
+  
+  // updating weight for each particle
+  for(Particle i : particles) {
+    // Calculate prediction vector 
+    predicted.clear();
+    // Populate predictions in increasing landmark iD order
+    for(int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
+      Xr = cos(i.theta)*i.x + sin(i.theta)*i.y + map_landmarks.landmark_list[j].x_f;
+      Yr = cos(i.theta)*i.y - sin(i.theta)*i.x + map_landmarks.landmark_list[j].y_f;
+      
+      LandmarkObs lm;
+      lm.id = map_landmarks.landmark_list[j].id_i;
+      lm.x = Xr;
+      lm.y = Yr;
+      
+      predicted.push_back(lm);
+    }
+    
+    // Calculate dataAssociation between prediction and observation vector
+    dataAssociation(predicted, observationsT);
+    
+    // Calculate weight as product sum of probability for each measurement pair (Z*,Z)
+    // [1] Sort observationsT by ID so index i == j (sort in increasing id order)
+    // sort(predicted.begin(),predicted.end(),comp);          // sort predicted (not necessary)
+    sort(observationsT.begin(),observationsT.end(),comp);  // sort observations 
+    
+    // [2] Set up variables 
+    double W = 1;
+    double Prob;
+    
+    // [3] Loop Through each observation, prediction pair and calculate prob + update product sum
+    for( int j = 0; j < observationsT.size(); ++j) {
+      Xob = observationsT[j].x;
+      Yob = observationsT[j].y;
+      Xpr = predicted[j].x;
+      Ypr = predicted[j].y;
+      Prob = (1/(2*M_PI*SigX*SigY))*exp(-(((Xob-Xpr)*(Xob-Xpr)/(2*SigX*SigX))+((Yob-Ypr)*(Yob-Ypr)/(2*SigY*SigY))));
+      W = W*Prob;
+    }
+    
+    // Update i.weight
+    i.weight = W;
+  }
 
 }
 
