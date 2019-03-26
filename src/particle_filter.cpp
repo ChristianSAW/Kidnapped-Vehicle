@@ -21,6 +21,9 @@
 using std::string;
 using std::vector;
 using std::normal_distribution;
+using std::min_element;
+
+using namespace std;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
@@ -97,7 +100,18 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   probably find it useful to implement this method and use it as a helper 
    *   during the updateWeights phase.
    */
-
+  // can modify predicted vector. Will not change actual vector. 
+  vector<double> distV;
+  for(LandmarkObs i : observations) {
+    distV.clear();                      // clear vector for each loop
+    for(LandmarkObs j : predicted) {
+      distV.push_back(dist(i.x,i.y,j.x,j.y));
+    }
+    // get index of closest landmark
+    int minIndex = min_element(distV.begin(),distV.end())-distV.begin(); 
+    i.id = predicted[minIndex].id;                  // pair pred and obs id
+    predicted.erase(predicted.begin()+minIndex);    // erase pared landmark from pred list
+  }
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
