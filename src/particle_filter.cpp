@@ -108,7 +108,7 @@ void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted,
   double min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
   int minInd;
   double dist_;
-  for (LandmarksObs i : observations) {
+  for (LandmarkObs i : observations) {
     minInd = -1;
     for(j = 0; j < predicted.size(); ++j) {
       dist_ = dist(i.x,i.y,predicted[j].x,predicted[j].y);
