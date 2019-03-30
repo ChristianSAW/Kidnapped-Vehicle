@@ -25,6 +25,13 @@ using std::min_element;
 
 using namespace std;
 
+// Cases Related to updating weights
+int CASE_1 = 0;
+int CASE_A = 1;
+int CASE_A_a = 1;    
+int CASE_A_b = 0;
+int CASE_B = 0;
+
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
    * TODO: Set the number of particles. Initialize all particles to 
@@ -101,6 +108,7 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   during the updateWeights phase.
    */
   // can modify predicted vector. Will not change actual vector. 
+  #if (CASE_1)
   vector<double> distV;
   for(LandmarkObs i : observations) {
     distV.clear();                      // clear vector for each loop
@@ -112,6 +120,26 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
     i.id = predicted[minIndex].id;                  // pair pred and obs id
     predicted.erase(predicted.begin()+minIndex);    // erase pared landmark from pred list
   }
+  #endif
+  #if (CASE_A)
+  #if (CASE_A_a) // allow predictions to be associated with more than 1 observation
+  double min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
+  int minInd;
+  double dist_;
+  for (LandmarksObs i : observations) {
+    minInd = -1;
+    for(LandmarksObs j : predicted) {
+      dist_ = dist(i.x,i.y,j.x,j.y);
+      if ( dist_ < min_dist) {
+        min_dist = dist_;
+        min
+      }
+    }
+    
+  }
+  #endif 
+  #endif
+  
 }
 
 bool comp(LandmarkObs a, LandmarkObs b) {
@@ -139,6 +167,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   // id as you populate in order of increasing id. Only need to sort observations vector.
   // [2] std_landmark = [sig_x, sig_y]
   
+  #if (CASE_1)
   // Variables
   vector<LandmarkObs> predicted;
   double Xr;
@@ -152,12 +181,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   // Problem is that we cant output anything so we have to change observations. 
   // 2) swich predicted and observations input into dataAssociation.
   vector<LandmarkObs> observationsT = observations; 
-  
+
   // updating weight for each particle
   for(Particle i : particles) {
     // Calculate prediction vector 
     predicted.clear();
-    // Populate predictions in increasing landmark iD order
+    // Populate predictions in increasing landmark iD order (Transform Global -> Robot)
     for(int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
       Xr = cos(i.theta)*i.x + sin(i.theta)*i.y + map_landmarks.landmark_list[j].x_f;
       Yr = cos(i.theta)*i.y - sin(i.theta)*i.x + map_landmarks.landmark_list[j].y_f;
@@ -195,7 +224,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     // Update i.weight
     i.weight = W;
   }
-
+  #endif
+  
+  #if (CASE_A)
+  
+  #endif
 }
 
 void ParticleFilter::resample() {
