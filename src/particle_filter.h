@@ -56,6 +56,29 @@ class ParticleFilter {
    */
   void prediction(double delta_t, double std_pos[], double velocity, 
                   double yaw_rate);
+
+  
+  /**
+   * nearestNeighbor_multiAss uses a nearest neighbors approach to find 
+   * which observations correspond to which landmarks. Allows for a single
+   * predicted landmark to be associated with multiple observed landmarks. 
+   *
+   * @param predicted Vector of predicted landmark observations
+   * @param observations Vector of landmark observations
+   */
+  void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted, 
+                                     vector<LandmarkObs>& observations);
+
+  /**
+   * nearestNeighbor_singleAss uses a nearest neighbors approach to find 
+   * which observations correspond to which landmarks. Allows for a single
+   * predicted landmark to be associated with only a single observed landmark. 
+   *
+   * @param predicted Vector of predicted landmark observations
+   * @param observations Vector of landmark observations
+   */
+  void ParticleFilter::nearestNeighbor_singleAss(vector<LandmarkObs> predicted, 
+                                     vector<LandmarkObs>& observations);
   
   /**
    * dataAssociation Finds which observations correspond to which landmarks 
@@ -66,6 +89,16 @@ class ParticleFilter {
   void dataAssociation(std::vector<LandmarkObs> predicted, 
                        std::vector<LandmarkObs>& observations);
   
+
+  /**
+   * compID is a comparator function which sorts in increasing order based off 
+   * Landmark id. 
+   *
+   * @param a id of Landmark a
+   * @param b id of Landmark b
+   */
+  bool compID(LandmarkObs a, LandmarkObs b);
+
   /**
    * updateWeights Updates the weights for each particle based on the likelihood
    *   of the observed measurements. 

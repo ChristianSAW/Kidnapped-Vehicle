@@ -178,7 +178,7 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   
 }
 
-bool comp(LandmarkObs a, LandmarkObs b) {
+bool compID(LandmarkObs a, LandmarkObs b) {
   return a.id < b.id;
 }
 
@@ -241,7 +241,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     // Calculate weight as product sum of probability for each measurement pair (Z*,Z)
     // [1] Sort observationsT by ID so index i == j (sort in increasing id order)
     // sort(predicted.begin(),predicted.end(),comp);          // sort predicted (not necessary)
-    sort(observationsT.begin(),observationsT.end(),comp);  // sort observations 
+    sort(observationsT.begin(),observationsT.end(),compID);  // sort observations 
     
     // [2] Set up variables 
     double W = 1;
