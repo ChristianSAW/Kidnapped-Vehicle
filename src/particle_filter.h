@@ -66,8 +66,8 @@ class ParticleFilter {
    * @param predicted Vector of predicted landmark observations
    * @param observations Vector of landmark observations
    */
-  void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted, 
-                                     vector<LandmarkObs>& observations);
+  void ParticleFilter::nearestNeighbor_multiAss(std::vector<LandmarkObs> predicted, 
+                                     std::vector<LandmarkObs>& observations);
 
   /**
    * nearestNeighbor_singleAss uses a nearest neighbors approach to find 
@@ -77,8 +77,8 @@ class ParticleFilter {
    * @param predicted Vector of predicted landmark observations
    * @param observations Vector of landmark observations
    */
-  void ParticleFilter::nearestNeighbor_singleAss(vector<LandmarkObs> predicted, 
-                                     vector<LandmarkObs>& observations);
+  void ParticleFilter::nearestNeighbor_singleAss(std::vector<LandmarkObs> predicted, 
+                                     std::vector<LandmarkObs>& observations);
   
   /**
    * dataAssociation Finds which observations correspond to which landmarks 
