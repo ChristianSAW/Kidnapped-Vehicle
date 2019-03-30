@@ -66,7 +66,7 @@ class ParticleFilter {
    * @param predicted Vector of predicted landmark observations
    * @param observations Vector of landmark observations
    */
-  void ParticleFilter::nearestNeighbor_multiAss(std::vector<LandmarkObs> predicted, 
+  void nearestNeighbor_multiAss(std::vector<LandmarkObs> predicted, 
                                      std::vector<LandmarkObs>& observations);
 
   /**
@@ -77,7 +77,7 @@ class ParticleFilter {
    * @param predicted Vector of predicted landmark observations
    * @param observations Vector of landmark observations
    */
-  void ParticleFilter::nearestNeighbor_singleAss(std::vector<LandmarkObs> predicted, 
+  void nearestNeighbor_singleAss(std::vector<LandmarkObs> predicted, 
                                      std::vector<LandmarkObs>& observations);
   
   /**
