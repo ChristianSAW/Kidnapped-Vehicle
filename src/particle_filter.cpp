@@ -97,6 +97,50 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   
 }
 
+void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted, 
+                                     vector<LandmarkObs>& observations) {
+  /**
+   * Computes the nearest neighbor allowing predited landmarks to be associated
+   * with multiple observed landmarks. 
+   * Note: predicted.size() can be <, >, = observations.size(); 
+   */
+
+  double min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
+  int minInd;
+  double dist_;
+  for (LandmarksObs i : observations) {
+    minInd = -1;
+    for(j = 0; j < predicted.size(); ++j) {
+      dist_ = dist(i.x,i.y,predicted[j].x,predicted[j].y);
+      if ( dist_ < min_dist) {
+        min_dist = dist_;
+        minInd = j; 
+      }
+    }
+    i.id = predicted[minInd].id;
+  }                                   
+}
+
+void ParticleFilter::nearestNeighbor_singleAss(vector<LandmarkObs> predicted, 
+                                     vector<LandmarkObs>& observations) {
+  /**
+   * Computes the nearest neighbor allowing predited landmarks to be associated
+   * with only a single observed landmark
+   * REQUIRES: predicted.size() = observations.size(); 
+   */ 
+  vector<double> distV;
+  for(LandmarkObs i : observations) {
+    distV.clear();                      // clear vector for each loop
+    for(LandmarkObs j : predicted) {
+      distV.push_back(dist(i.x,i.y,j.x,j.y));
+    }
+    // get index of closest landmark
+    int minIndex = min_element(distV.begin(),distV.end())-distV.begin(); 
+    i.id = predicted[minIndex].id;                  // pair pred and obs id
+    predicted.erase(predicted.begin()+minIndex);    // erase pared landmark from pred list
+  }                                    
+}
+
 void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted, 
                                      vector<LandmarkObs>& observations) {
   /**
@@ -108,34 +152,26 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   during the updateWeights phase.
    */
   // can modify predicted vector. Will not change actual vector. 
+  // [CASE 1]: Each observation associated with 1 prediction. 
+  // Reqires predictions.size() = observations.size().
+  // [CASE A]: 
+  // [CASE A_a]: Predictions can be associated with more than 1 observation
+  // [CASE A_b]: Predictions can be associated with more than 1 observation iff 
+  // predictions.size() < observations.size().  
+
   #if (CASE_1)
-  vector<double> distV;
-  for(LandmarkObs i : observations) {
-    distV.clear();                      // clear vector for each loop
-    for(LandmarkObs j : predicted) {
-      distV.push_back(dist(i.x,i.y,j.x,j.y));
-    }
-    // get index of closest landmark
-    int minIndex = min_element(distV.begin(),distV.end())-distV.begin(); 
-    i.id = predicted[minIndex].id;                  // pair pred and obs id
-    predicted.erase(predicted.begin()+minIndex);    // erase pared landmark from pred list
-  }
+  nearestNeighbor_singleAss(predicted, observations);
   #endif
   #if (CASE_A)
-  #if (CASE_A_a) // allow predictions to be associated with more than 1 observation
-  double min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
-  int minInd;
-  double dist_;
-  for (LandmarksObs i : observations) {
-    minInd = -1;
-    for(LandmarksObs j : predicted) {
-      dist_ = dist(i.x,i.y,j.x,j.y);
-      if ( dist_ < min_dist) {
-        min_dist = dist_;
-        min
-      }
-    }
-    
+  #if (CASE_A_a) 
+  nearestNeighbor_multiAss(predicted, observations);
+  #endif
+  #if (Case_A_b) 
+  // Check size:
+  if (predicted.size() < observations.size()) {
+    nearestNeighbor_multiAss(predicted, observations);
+  } else { // predicted.size() >= observations.size()
+    nearestNeighbor_singleAss(predicted, observations);
   }
   #endif 
   #endif
