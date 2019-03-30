@@ -110,7 +110,7 @@ void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted,
   double dist_;
   for (LandmarkObs i : observations) {
     minInd = -1;
-    for(j = 0; j < predicted.size(); ++j) {
+    for(int j = 0; j < predicted.size(); ++j) {
       dist_ = dist(i.x,i.y,predicted[j].x,predicted[j].y);
       if ( dist_ < min_dist) {
         min_dist = dist_;
