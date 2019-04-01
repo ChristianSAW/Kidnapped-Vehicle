@@ -189,6 +189,103 @@ bool compID(LandmarkObs a, LandmarkObs b) {
   return a.id < b.id;
 }
 
+double calcWeightSameSize(double std_landmark[],
+                        const vector<LandmarkObs> &observationsT,
+                        const vector<LandmarkObs> &predicted) {
+  /**
+   * Calculates the weight for a single particle given the observations
+   * and predictions vector. Assumes a given prediction measurement can be
+   * paird with a single observation measurement. 
+   * 
+   * REQUIRES: observationsT.size() == predicted.size()
+   */
+                
+  // Variables 
+  double Xob, Yob, Xpr, Ypr;
+  double SigX = std_landmark[0];
+  double SigY = std_landmark[1];
+  double varX = pow(SigX,2);
+  double varY = pow(SigY,2);
+  double Prob, W; 
+  double delX2, delY2;
+  
+  // Calculate weight as product sum of probability for each measurement pair (Z*,Z)
+  // [1] Sort observationsT by ID so index i == j (sort in increasing id order)
+  // sort(predicted.begin(),predicted.end(),comp);          // sort predicted (not necessary)
+  sort(observationsT.begin(),observationsT.end(),compID);  // sort observations 
+    
+    // [2] Set up variables 
+    W = 1;
+    
+    // [3] Loop Through each observation, prediction pair and calculate prob + update product sum
+    for( int j = 0; j < observationsT.size(); ++j) {
+      Xob = observationsT[j].x;
+      Yob = observationsT[j].y;
+      Xpr = predicted[j].x;
+      Ypr = predicted[j].y;      
+      delX2 = pow((Xob-Xpr),2);
+      delY2 = pow((Yob-Ypr),2);
+
+      //Prob = (1/(2*M_PI*SigX*SigY))*exp(-(((Xob-Xpr)*(Xob-Xpr)/(2*SigX*SigX))+((Yob-Ypr)*(Yob-Ypr)/(2*SigY*SigY))));
+      Prob = (1/(2*M_PI*SigX*SigY))*exp(-((delX2/(2*varX))+(delY2/(2*varY))));
+      W = W*Prob;
+    }
+    
+    return W;
+
+}
+
+double calcWeightDiffSize(double std_landmark[],
+                        const vector<LandmarkObs> &observationsT,
+                        const vector<LandmarkObs> &predicted) {
+  /**
+   * Calculates the weight for a single particle given the observations
+   * and predictions vector. Assumes a given prediction measurement can be
+   * paird with multiple observation measurements. 
+   * 
+   */
+  
+  // Variables 
+  double Xob, Yob, Xpr, Ypr;
+  double SigX = std_landmark[0];
+  double SigY = std_landmark[1];
+  double varX = pow(SigX,2);
+  double varY = pow(SigY,2);
+  double Prob, W; 
+  double delX2, delY2;
+  int match;
+  
+  // Calculate weight as product sum of probability for each measurement pair (Z*,Z)
+  // [1] Assign initial value to variable W
+  W = 1;
+
+  // [2] Loop Through each observation, prediction pair and calculate prob + update product sum
+  for( int j = 0; j < observationsT.size(); ++j) {
+    match = 0;
+    // [3] find prediction observation id match.
+    for (int k = 0; k < predicted.size(); ++k) {
+      if (observationsT[j].id == predicted[k].id) {
+        Xpr = predicted[j].x;
+        Ypr = predicted[j].y;
+        match = 1;
+      }
+    }
+    if (match == 0) {
+      cout << "Error, Could not match observation " << j << "with a prediction."<<endl;
+      Xpr = predicted[0].x;
+      Ypr = predicted[0].y;
+    }
+    Xob = observationsT[j].x;
+    Yob = observationsT[j].y;
+    delX2 = pow((Xob-Xpr),2);
+    delY2 = pow((Yob-Ypr),2);
+    
+    Prob = (1/(2*M_PI*SigX*SigY))*exp(-((delX2/(2*varX))+(delY2/(2*varY))));
+    W = W*Prob;
+  }
+  return W;
+}
+
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
                                    const vector<LandmarkObs> &observations, 
                                    const Map &map_landmarks) {
@@ -220,11 +317,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   #if (false) // CASE_1
   // Variables
   vector<LandmarkObs> predicted;
-  double Xr;
-  double Yr;
-  double Xob, Yob, Xpr, Ypr;
-  double SigX = std_landmark[0];
-  double SigY = std_landmark[1];
+  double Xr, Yr;
   
   // need to make a copy of observations so we can modify it. 
   // alternatively, we could 1) change dataAssociation to change predicted and not observations id.
@@ -252,40 +345,62 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     // Calculate dataAssociation between prediction and observation vector
     dataAssociation(predicted, observationsT);
     
-    // Calculate weight as product sum of probability for each measurement pair (Z*,Z)
-    // [1] Sort observationsT by ID so index i == j (sort in increasing id order)
-    // sort(predicted.begin(),predicted.end(),comp);          // sort predicted (not necessary)
-    sort(observationsT.begin(),observationsT.end(),compID);  // sort observations 
-    
-    // [2] Set up variables 
-    double W = 1;
-    double Prob;
-    
-    // [3] Loop Through each observation, prediction pair and calculate prob + update product sum
-    for( int j = 0; j < observationsT.size(); ++j) {
-      Xob = observationsT[j].x;
-      Yob = observationsT[j].y;
-      Xpr = predicted[j].x;
-      Ypr = predicted[j].y;
-      Prob = (1/(2*M_PI*SigX*SigY))*exp(-(((Xob-Xpr)*(Xob-Xpr)/(2*SigX*SigX))+((Yob-Ypr)*(Yob-Ypr)/(2*SigY*SigY))));
-      W = W*Prob;
-    }
-    
     // Update i.weight
-    i.weight = W;
+    i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
   }
   #endif
   
   #if (true) // CASE_A
-  #if (true) // CASE_A_a
+  // Variables
+  vector<LandmarkObs> predicted;
+  double Xr, Yr;
+  double ml_x, ml_y;
+  vector<LandmarkObs> observationsT = observations; 
+  for(Particle i : particles) {
+    
+    // Calculate prediction vector 
+    predicted.clear();
+
+    // Populate prediction vector 
+    for(int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
+      ml_x = map_landmarks.landmark_list[j].x_f;
+      ml_y = map_landmarks.landmark_list[j].y_f;
+      
+      // [1] Check if landmark is in range 
+      if (fabs(ml_x-i.x) <= sensor_range && fabs(ml_y - i.y) <= sensor_range) {
+        
+        // [2] Convert landmark to local frame 
+        Xr = cos(i.theta)*i.x + sin(i.theta)*i.y + map_landmarks.landmark_list[j].x_f;
+        Yr = cos(i.theta)*i.y - sin(i.theta)*i.x + map_landmarks.landmark_list[j].y_f;
+        
+        // [3] Add landmark to predicted vector
+        LandmarkObs lm;
+        lm.id = map_landmarks.landmark_list[j].id_i;
+        lm.x = Xr;
+        lm.y = Yr;
+      
+        predicted.push_back(lm);
+      }
+    }
+
+    // Calculate dataAssociation between prediction and observation vector
+    dataAssociation(predicted, observationsT);
   
+    #if (true) // CASE_A_a
+    // Update i.weight
+    i.weight = calcWeightDiffSize(std_landmark,observationsT,predicted);
+    #endif
 
-  #endif
-
-  #if (false) // CASE_A_b
-
-  #endif
-  
+    #if (false) // CASE_A_b
+    if (predicted.size() == observationsT.size()) {
+      // CASE 1;
+      i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
+    } else {
+      // CASE A_a:
+      i.weight = calcWeightDiffSize(std_landmark, observationsT, predicted);
+    }
+    #endif
+  }
   #endif
 }
 
