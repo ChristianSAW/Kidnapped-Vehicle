@@ -21,6 +21,13 @@
 const double M_PI = 3.14159265358979323846;
 #endif
 
+// Cases Related to updating weights
+//int CASE_1 = 0;
+//int CASE_A = 1;
+//int CASE_A_a = 1;    
+//int CASE_A_b = 0;
+//int CASE_B = 0;
+
 /**
  * Struct representing one position/control measurement.
  */

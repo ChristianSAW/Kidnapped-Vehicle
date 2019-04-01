@@ -26,11 +26,11 @@ using std::min_element;
 using namespace std;
 
 // Cases Related to updating weights
-int CASE_1 = 0;
-int CASE_A = 1;
-int CASE_A_a = 1;    
-int CASE_A_b = 0;
-int CASE_B = 0;
+//int CASE_1 = 0;
+//int CASE_A = 1;
+//int CASE_A_a = 1;    
+//int CASE_A_b = 0;
+//int CASE_B = 0;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
@@ -159,14 +159,21 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   // [CASE A_b]: Predictions can be associated with more than 1 observation iff 
   // predictions.size() < observations.size().  
 
-  #if (CASE_1)
+  // Cases Related to updating weights
+  bool CASE_1 = false;
+  bool CASE_A = true;
+  bool CASE_A_a = true;    
+  bool CASE_A_b = false;
+  bool CASE_B = false;
+
+  #if (false) // CASE_1
   nearestNeighbor_singleAss(predicted, observations);
   #endif
-  #if (CASE_A)
-  #if (CASE_A_a) 
+  #if (true) // CASE_A
+  #if (true) // CASE_A_a
   nearestNeighbor_multiAss(predicted, observations);
   #endif
-  #if (Case_A_b) 
+  #if (false) // CASE_A_b
   // Check size:
   if (predicted.size() < observations.size()) {
     nearestNeighbor_multiAss(predicted, observations);
@@ -202,8 +209,15 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   // [1] map has landmarks in order of id, so no need to sort landmarks in prediction vector by 
   // id as you populate in order of increasing id. Only need to sort observations vector.
   // [2] std_landmark = [sig_x, sig_y]
+
+  // Cases Related to updating weights
+  bool CASE_1 = false;
+  bool CASE_A = true;
+  bool CASE_A_a = true;    
+  bool CASE_A_b = false;
+  bool CASE_B = false;
   
-  #if (CASE_1)
+  #if (false) // CASE_1
   // Variables
   vector<LandmarkObs> predicted;
   double Xr;
@@ -262,7 +276,15 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   }
   #endif
   
-  #if (CASE_A)
+  #if (true) // CASE_A
+  #if (true) // CASE_A_a
+  
+
+  #endif
+
+  #if (false) // CASE_A_b
+
+  #endif
   
   #endif
 }

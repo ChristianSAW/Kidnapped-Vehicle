@@ -34,6 +34,13 @@ class ParticleFilter {
   // Destructor
   ~ParticleFilter() {}
 
+  // Cases Related to updating weights
+  int CASE_1 = 0;
+  int CASE_A = 1;
+  int CASE_A_a = 1;    
+  int CASE_A_b = 0;
+  int CASE_B = 0;
+
   /**
    * init Initializes particle filter by initializing particles to Gaussian
    *   distribution around first position and all the weights to 1.
