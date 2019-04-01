@@ -35,11 +35,11 @@ class ParticleFilter {
   ~ParticleFilter() {}
 
   // Cases Related to updating weights
-  int CASE_1 = 0;
-  int CASE_A = 1;
-  int CASE_A_a = 1;    
-  int CASE_A_b = 0;
-  int CASE_B = 0;
+  //int CASE_1 = 0;
+  //int CASE_A = 1;
+  //int CASE_A_a = 1;    
+  //int CASE_A_b = 0;
+  //int CASE_B = 0;
 
   /**
    * init Initializes particle filter by initializing particles to Gaussian
@@ -105,6 +105,34 @@ class ParticleFilter {
    * @param b id of Landmark b
    */
   bool compID(LandmarkObs a, LandmarkObs b);
+
+  /**
+   * calcWeightSameSize calclates and returns the weight for a particle given 
+   * observation and prediction measurements. Assumes a given prediction measurement 
+   * can be paird with a single observation measurement. 
+   *
+   * @param std_landmark[] Array of dimension 2
+   *   [Landmark measurement uncertainty [x [m], y [m]]]
+   * @param observationsT Vector of landmark observations
+   * @param predicted Vector of predicted landmark observations
+   */
+  double calcWeightSameSize(double std_landmark[],
+                        const vector<LandmarkObs> &observationsT,
+                        const vector<LandmarkObs> &predicted);
+
+  /**
+   * calcWeightDiffSize calclates and returns the weight for a particle given 
+   * observation and prediction measurements. Assumes a given prediction measurement 
+   * can be paird with multiple observation measurements. 
+   *
+   * @param std_landmark[] Array of dimension 2
+   *   [Landmark measurement uncertainty [x [m], y [m]]]
+   * @param observationsT Vector of landmark observations
+   * @param predicted Vector of predicted landmark observations
+   */
+  double calcWeightDiffSize(double std_landmark[],
+                        const vector<LandmarkObs> &observationsT,
+                        const vector<LandmarkObs> &predicted);
 
   /**
    * updateWeights Updates the weights for each particle based on the likelihood
