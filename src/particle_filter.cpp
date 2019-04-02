@@ -43,6 +43,8 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    */
   num_particles = 100;  // TODO: Set the number of particles
   
+  weights.resize(num_particles);
+  
   // std = [sig_x, sig_y, sig_theta]
   std::default_random_engine gen;           // random generator
   normal_distribution<double> dist_x(x, std[0]);
@@ -53,6 +55,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   // Determine later if we want to normalize weights
   for(int i = 0; i < num_particles; ++i) {
     Particle p; 
+    p.id = i;
     p.x = dist_x(gen);
     p.y = dist_y(gen);
     p.theta = dist_theta(gen);
