@@ -190,8 +190,8 @@ bool ParticleFilter::compID(LandmarkObs a, LandmarkObs b) {
 }
 
 double ParticleFilter::calcWeightSameSize(double std_landmark[],
-                        const vector<LandmarkObs> &observationsT,
-                        const vector<LandmarkObs> &predicted) {
+                        vector<LandmarkObs> &observationsT,
+                        vector<LandmarkObs> &predicted) {
   /**
    * Calculates the weight for a single particle given the observations
    * and predictions vector. Assumes a given prediction measurement can be
@@ -236,8 +236,8 @@ double ParticleFilter::calcWeightSameSize(double std_landmark[],
 }
 
 double ParticleFilter::calcWeightDiffSize(double std_landmark[],
-                        const vector<LandmarkObs> &observationsT,
-                        const vector<LandmarkObs> &predicted) {
+                        vector<LandmarkObs> &observationsT,
+                        vector<LandmarkObs> &predicted) {
   /**
    * Calculates the weight for a single particle given the observations
    * and predictions vector. Assumes a given prediction measurement can be
