@@ -185,11 +185,11 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   
 }
 
-bool compID(LandmarkObs a, LandmarkObs b) {
+bool ParticleFilter::compID(LandmarkObs a, LandmarkObs b) {
   return a.id < b.id;
 }
 
-double calcWeightSameSize(double std_landmark[],
+double ParticleFilter::calcWeightSameSize(double std_landmark[],
                         const vector<LandmarkObs> &observationsT,
                         const vector<LandmarkObs> &predicted) {
   /**
@@ -235,7 +235,7 @@ double calcWeightSameSize(double std_landmark[],
 
 }
 
-double calcWeightDiffSize(double std_landmark[],
+double ParticleFilter::calcWeightDiffSize(double std_landmark[],
                         const vector<LandmarkObs> &observationsT,
                         const vector<LandmarkObs> &predicted) {
   /**
