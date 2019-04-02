@@ -10,6 +10,8 @@ using nlohmann::json;
 using std::string;
 using std::vector;
 
+using namespace std;
+
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
 // else the empty string "" will be returned.
@@ -44,6 +46,12 @@ int main() {
     return -1;
   }
 
+  #if(true) // DEBUGGING
+  // Variables 
+  int timeSTP = 0;
+
+  #endif
+
   // Create particle filter
   ParticleFilter pf;
 
@@ -62,6 +70,12 @@ int main() {
         string event = j[0].get<string>();
         
         if (event == "telemetry") {
+
+          #if(true) // DEBUGGING 
+          cout<<"Timestamp: "<< timeSTP<<endl;
+          cout<<"-----------------------------"<<endl;
+          ++timeSTP;
+          #endif
           // j[1] is the data JSON object
           if (!pf.initialized()) {
             // Sense noisy position data from the simulator
@@ -145,6 +159,11 @@ int main() {
           // std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }  // end "telemetry" if
+
+        #if (true) // DEBUGGING
+        cout<<"-----------------------------"<<endl;
+        #endif
+
       } else {
         string msg = "42[\"manual\",{}]";
         ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);

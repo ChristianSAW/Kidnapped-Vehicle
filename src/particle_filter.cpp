@@ -59,6 +59,17 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     p.weight = 1;
     particles.push_back(p);
   }
+
+  #if (true) // Debugging
+  cout<<"Initialized Particles"<<endl;
+  cout<<"Number of particles: "<< particles.size() <<endl;
+  int n = 10; // must be less than num_particles
+  cout<<"Printing First "<<n<<" particles"<<endl;
+  for(int i = 0; (i < num_particles) && (i < n); ++i) {
+    cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].x;
+    cout<<"]; W = "<< particles[i].weight<<endl;
+  }
+  #endif
   
 
 }
