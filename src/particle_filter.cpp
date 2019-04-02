@@ -412,11 +412,44 @@ void ParticleFilter::resample() {
    *   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
    */
 
+  vector<Particle> new_particles;
+
+  // get all of the current weights
+  vector<double> weights;
+  for (int i = 0; i < num_particles; i++) {
+    weights.push_back(particles[i].weight);
+  }
+  default_random_engine gen;
+  // generate random starting index for resampling wheel
+  uniform_int_distribution<int> uniintdist(0, num_particles-1);
+
+  auto index = uniintdist(gen);
+
+  // get max weight
+  double max_weight = *max_element(weights.begin(), weights.end());
+
+  // uniform random distribution [0.0, max_weight)
+  uniform_real_distribution<double> unirealdist(0.0, max_weight);
+
+  double beta = 0.0;
+
+  // resample
+  for (int i = 0; i < num_particles; i++) {
+    beta += unirealdist(gen) * 2.0;
+    while (beta > weights[index]) {
+      beta -= weights[index];
+      index = (index + 1) % num_particles;
+    }
+    new_particles.push_back(particles[index]);
+  }
+
+particles = new_particles;
+
 }
 
 void ParticleFilter::SetAssociations(Particle& particle, 
                                      const vector<int>& associations, 
-                                     const vector<double>& sense_x, 
+                                     const vector<double>& sense_x,
                                      const vector<double>& sense_y) {
   // particle: the particle to which assign each listed association, 
   //   and association's (x,y) world coordinates mapping
