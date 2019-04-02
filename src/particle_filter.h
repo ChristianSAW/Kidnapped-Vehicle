@@ -104,7 +104,7 @@ class ParticleFilter {
    * @param a id of Landmark a
    * @param b id of Landmark b
    */
-  bool compID(LandmarkObs a, LandmarkObs b);
+  static bool compID(LandmarkObs a, LandmarkObs b);
 
   /**
    * calcWeightSameSize calclates and returns the weight for a particle given 
