@@ -117,8 +117,8 @@ class ParticleFilter {
    * @param predicted Vector of predicted landmark observations
    */
   double calcWeightSameSize(double std_landmark[],
-                        const vector<LandmarkObs> &observationsT,
-                        const vector<LandmarkObs> &predicted);
+                        const std::vector<LandmarkObs> &observationsT,
+                        const std::vector<LandmarkObs> &predicted);
 
   /**
    * calcWeightDiffSize calclates and returns the weight for a particle given 
@@ -131,8 +131,8 @@ class ParticleFilter {
    * @param predicted Vector of predicted landmark observations
    */
   double calcWeightDiffSize(double std_landmark[],
-                        const vector<LandmarkObs> &observationsT,
-                        const vector<LandmarkObs> &predicted);
+                        const std::vector<LandmarkObs> &observationsT,
+                        const std::vector<LandmarkObs> &predicted);
 
   /**
    * updateWeights Updates the weights for each particle based on the likelihood
