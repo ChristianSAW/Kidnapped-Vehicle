@@ -255,4 +255,11 @@ inline bool read_landmark_data(std::string filename,
   return true;
 }
 
+inline void printParticles(std::vector<Particle> particles, std::ofstream outfile) {
+  for(int i = 0; i < particles.size(); ++i) {
+    outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
+    outfile<<"]; W = "<< particles[i].weight<<endl;
+  }
+}
+
 #endif  // HELPER_FUNCTIONS_H_

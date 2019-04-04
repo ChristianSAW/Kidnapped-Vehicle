@@ -49,13 +49,16 @@ int main() {
   #if(true) // DEBUGGING
   // Variables 
   int timeSTP = 0;
-
+  // create or wipe new file 
+  const char path1 = "/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/particles.txt";
+  ofstream outfile(path1);    
+  outfile.close();
   #endif
 
   // Create particle filter
   ParticleFilter pf;
 
-  h.onMessage([&pf, &timeSTP, &map,&delta_t,&sensor_range,&sigma_pos,&sigma_landmark]
+  h.onMessage([&pf, &timeSTP, path1, &map,&delta_t,&sensor_range,&sigma_pos,&sigma_landmark]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -92,6 +95,19 @@ int main() {
 
             pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
           }
+
+          // Debugging
+          #if(true)
+          if ((timeSTP+1)%10 == 0) {
+            std::ofstream outfile;
+            outfile.open(path1,std::ios_base::app);
+            outfile<<"Timestamp: "<< timeSTP<<endl;
+            outfile<<"-----------------------------"<<endl;
+            printParticles(pf.particles, outfile); 
+            outfile<<"-----------------------------"<<endl;
+            outfile.close();
+          }
+          #endif
 
           // receive noisy observation data from the simulator
           // sense_observations in JSON format 
