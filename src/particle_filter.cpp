@@ -31,6 +31,7 @@ using namespace std;
 //int CASE_A_a = 1;    
 //int CASE_A_b = 0;
 //int CASE_B = 0;
+const double eps = 0.00001;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
@@ -79,7 +80,13 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     cout<<"]; W = "<< particles[i].weight<<endl;
   }
   // Add Particles to 'initialization.txt' file
-  ofstream outfile("/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/initialized_particles.txt");     // create an open file
+  // create an open file
+  ofstream outfile("/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/initialized_particles.txt");    
+  // populate initialization.txt
+  outfile<<"Initialized Particles"<<endl;
+  outfile<<"Number of particles: "<< particles.size() <<endl;
+  outfile<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
+  outfile<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
   for(int i = 0; i < num_particles; ++i) {
     outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     outfile<<"]; W = "<< particles[i].weight<<endl;
@@ -106,10 +113,16 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   
   // Prediction step for each particle i in particles
   for(Particle i : particles) {
-    Xf = i.x + (velocity/yaw_rate)*(sin(i.theta + yaw_rate*delta_t)-sin(i.theta));
-    Yf = i.y + (velocity/yaw_rate)*(cos(i.theta) - cos(i.theta + yaw_rate*delta_t));
-    Thetaf = i.theta + yaw_rate*delta_t;
-  
+
+    if (fabs(yaw_rate) < eps) {
+      Xf = i.x + (velocity*delta_t)*cos(i.theta);
+      Yf = i.y + (velocity*delta_t)*sin(i.theta);
+      Thetaf = i.theta;
+    } else {
+      Xf = i.x + (velocity/yaw_rate)*(sin(i.theta + yaw_rate*delta_t)-sin(i.theta));
+      Yf = i.y + (velocity/yaw_rate)*(cos(i.theta) - cos(i.theta + yaw_rate*delta_t));
+      Thetaf = i.theta + yaw_rate*delta_t;
+    }
     // Add noise
     normal_distribution<double> dist_x(Xf, std_pos[0]);
     normal_distribution<double> dist_y(Yf, std_pos[1]);
