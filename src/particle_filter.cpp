@@ -45,6 +45,8 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   
   weights.resize(num_particles);
   
+  //particles.clear();
+  
   // std = [sig_x, sig_y, sig_theta]
   std::default_random_engine gen;           // random generator
   normal_distribution<double> dist_x(x, std[0]);
@@ -62,26 +64,29 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     p.weight = 1;
     particles.push_back(p);
   }
+  is_initialized = true;
+  
 
   #if (true) // Debugging
   cout<<"Initialized Particles"<<endl;
   cout<<"Number of particles: "<< particles.size() <<endl;
+  cout<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
+  cout<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
   int n = 10; // must be less than num_particles
   cout<<"Printing First "<<n<<" particles"<<endl;
   for(int i = 0; (i < num_particles) && (i < n); ++i) {
-    cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].x;
+    cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     cout<<"]; W = "<< particles[i].weight<<endl;
   }
   // Add Particles to 'initialization.txt' file
-  ofstream outfile("initialized_particles.txt");   // create an open file
+  ofstream outfile("/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/initialized_particles.txt");     // create an open file
   for(int i = 0; i < num_particles; ++i) {
-    outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].x;
+    outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     outfile<<"]; W = "<< particles[i].weight<<endl;
   }
   outfile.close();
   #endif
   
-
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], 
@@ -292,7 +297,7 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
       }
     }
     if (match == 0) {
-      cout << "Error, Could not match observation " << j << "with a prediction."<<endl;
+      //cout << "Error, Could not match observation " << j << "with a prediction."<<endl;
       Xpr = predicted[0].x;
       Ypr = predicted[0].y;
     }
