@@ -72,6 +72,13 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].x;
     cout<<"]; W = "<< particles[i].weight<<endl;
   }
+  // Add Particles to 'initialization.txt' file
+  ofstream outfile("initialized_particles.txt");   // create an open file
+  for(int i = 0; i < num_particles; ++i) {
+    outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].x;
+    outfile<<"]; W = "<< particles[i].weight<<endl;
+  }
+  outfile.close();
   #endif
   
 
