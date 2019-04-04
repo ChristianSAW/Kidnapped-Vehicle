@@ -176,6 +176,7 @@ class ParticleFilter {
    */
   std::string getAssociations(Particle best);
   std::string getSenseCoord(Particle best, std::string coord);
+  void printParticles(std::ofstream &outfile);
 
   // Set of current particles
   std::vector<Particle> particles;

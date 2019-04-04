@@ -112,6 +112,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   std::default_random_engine gen;           // random generator
   
   // Prediction step for each particle i in particles
+  int j = 0;
   for(Particle i : particles) {
 
     if (fabs(yaw_rate) < eps) {
@@ -132,6 +133,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     i.x = dist_x(gen);
     i.y = dist_y(gen);
     i.theta = dist_theta(gen);
+    
+    particles[j].x = dist_x(gen);
+    particles[j].y = dist_y(gen);
+    particles[j].theta = dist_theta(gen);
+    ++j;
   }
   
 }
@@ -523,4 +529,11 @@ string ParticleFilter::getSenseCoord(Particle best, string coord) {
   string s = ss.str();
   s = s.substr(0, s.length()-1);  // get rid of the trailing space
   return s;
+}
+
+void ParticleFilter::printParticles(std::ofstream &outfile) {
+  for(int i = 0; i < particles.size(); ++i) {
+    outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
+    outfile<<"]; W = "<< particles[i].weight<<endl;
+  }
 }

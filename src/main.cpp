@@ -50,7 +50,7 @@ int main() {
   // Variables 
   int timeSTP = 0;
   // create or wipe new file 
-  const char path1 = "/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/particles.txt";
+  const char *path1 = "/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/particles.txt";
   ofstream outfile(path1);    
   outfile.close();
   #endif
@@ -92,7 +92,10 @@ int main() {
             //   (noiseless control) data.
             double previous_velocity = std::stod(j[1]["previous_velocity"].get<string>());
             double previous_yawrate = std::stod(j[1]["previous_yawrate"].get<string>());
-
+            
+            #if(true)
+            cout<<"Calling Predict Step"<<endl;
+            #endif
             pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
           }
 
@@ -100,10 +103,12 @@ int main() {
           #if(true)
           if ((timeSTP+1)%10 == 0) {
             std::ofstream outfile;
+            //outfile.open(path1,ios::out | ios::app | ios::binary);
             outfile.open(path1,std::ios_base::app);
+            //outfile.open(path1);
             outfile<<"Timestamp: "<< timeSTP<<endl;
             outfile<<"-----------------------------"<<endl;
-            printParticles(pf.particles, outfile); 
+            pf.printParticles(outfile); 
             outfile<<"-----------------------------"<<endl;
             outfile.close();
           }
