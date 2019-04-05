@@ -298,7 +298,7 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
   double varY = pow(SigY,2);
   double Prob, W; 
   double delX2, delY2;
-  int match;
+  int match = 0;
   
   // Calculate weight as product sum of probability for each measurement pair (Z*,Z)
   // [1] Assign initial value to variable W
