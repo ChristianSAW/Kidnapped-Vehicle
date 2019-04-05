@@ -401,6 +401,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   double Xr, Yr;
   double ml_x, ml_y;
   vector<LandmarkObs> observationsT = observations; 
+
+  #if(true)
+  cout<<"Observations Size"<<observationsT.size()<<endl;
+  int i_c;
+  #endif
+
   for(Particle &i : particles) {
     
     // Calculate prediction vector 
@@ -428,6 +434,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       }
     }
 
+    // Debuging 
+    #if (true)
+    cout<<"Pred Size, particle "<<i_c<<": "<< observationsT.size()<<endl;
+    #endif
+
     // Calculate dataAssociation between prediction and observation vector
     dataAssociation(predicted, observationsT);
   
@@ -444,6 +455,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       // CASE A_a:
       i.weight = calcWeightDiffSize(std_landmark, observationsT, predicted);
     }
+    #endif
+
+    #if(true)
+    ++i_c;
     #endif
   }
   #endif
