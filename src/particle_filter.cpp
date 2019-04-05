@@ -109,11 +109,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   
   // initializations:
   double Xf, Yf, Thetaf;
+  int j = 0;
   std::default_random_engine gen;           // random generator
   
   // Prediction step for each particle i in particles
-  int j = 0;
-  for(Particle i : particles) {
+  for(Particle &i : particles) {
 
     if (fabs(yaw_rate) < eps) {
       Xf = i.x + (velocity*delta_t)*cos(i.theta);
@@ -133,11 +133,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     i.x = dist_x(gen);
     i.y = dist_y(gen);
     i.theta = dist_theta(gen);
-    
-    particles[j].x = dist_x(gen);
-    particles[j].y = dist_y(gen);
-    particles[j].theta = dist_theta(gen);
-    ++j;
+
+    //particles[j].x = dist_x(gen);
+    //particles[j].y = dist_y(gen);
+    //particles[j].theta = dist_theta(gen);
+    //++j;
   }
   
 }
@@ -153,7 +153,7 @@ void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted,
   double min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
   int minInd;
   double dist_;
-  for (LandmarkObs i : observations) {
+  for (LandmarkObs &i : observations) {
     minInd = -1;
     for(int j = 0; j < predicted.size(); ++j) {
       dist_ = dist(i.x,i.y,predicted[j].x,predicted[j].y);
@@ -174,9 +174,9 @@ void ParticleFilter::nearestNeighbor_singleAss(vector<LandmarkObs> predicted,
    * REQUIRES: predicted.size() = observations.size(); 
    */ 
   vector<double> distV;
-  for(LandmarkObs i : observations) {
+  for(LandmarkObs &i : observations) {
     distV.clear();                      // clear vector for each loop
-    for(LandmarkObs j : predicted) {
+    for(LandmarkObs &j : predicted) {
       distV.push_back(dist(i.x,i.y,j.x,j.y));
     }
     // get index of closest landmark
@@ -371,7 +371,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   vector<LandmarkObs> observationsT = observations; 
 
   // updating weight for each particle
-  for(Particle i : particles) {
+  for(Particle &i : particles) {
     // Calculate prediction vector 
     predicted.clear();
     // Populate predictions in increasing landmark iD order (Transform Global -> Robot)
@@ -401,7 +401,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   double Xr, Yr;
   double ml_x, ml_y;
   vector<LandmarkObs> observationsT = observations; 
-  for(Particle i : particles) {
+  for(Particle &i : particles) {
     
     // Calculate prediction vector 
     predicted.clear();
