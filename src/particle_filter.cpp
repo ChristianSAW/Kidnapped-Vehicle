@@ -404,7 +404,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
   #if(true)
   cout<<"Observations Size"<<observationsT.size()<<endl;
-  int i_c;
+  int i_c = 0;
   #endif
 
   for(Particle &i : particles) {
