@@ -178,6 +178,7 @@ class ParticleFilter {
   std::string getSenseCoord(Particle best, std::string coord);
   void printParticles(std::ofstream &outfile);
   void printIDs(std::vector<LandmarkObs> landmarks);
+  void printObs(std::vector<LandmarkObs> landmarks);
 
   // Set of current particles
   std::vector<Particle> particles;
