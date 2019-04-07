@@ -56,7 +56,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   
   // POPULATE PARTICLES VECTOR
   // Determine later if we want to normalize weights
-  for(unsigned int i = 0; i < num_particles; ++i) {
+  for(int i = 0; i < num_particles; ++i) {
     Particle p; 
     p.id = i;
     p.x = dist_x(gen);
@@ -75,7 +75,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   cout<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
   int n = 10; // must be less than num_particles
   cout<<"Printing First "<<n<<" particles"<<endl;
-  for(unsigned int i = 0; (i < num_particles) && (i < n); ++i) {
+  for(int i = 0; (i < num_particles) && (i < n); ++i) {
     cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     cout<<"]; W = "<< particles[i].weight<<endl;
   }
@@ -87,7 +87,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   outfile<<"Number of particles: "<< particles.size() <<endl;
   outfile<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
   outfile<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
-  for(unsigned int i = 0; i < num_particles; ++i) {
+  for(int i = 0; i < num_particles; ++i) {
     outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     outfile<<"]; W = "<< particles[i].weight<<endl;
   }
