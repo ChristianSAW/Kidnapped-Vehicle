@@ -441,6 +441,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
     // Calculate dataAssociation between prediction and observation vector
     dataAssociation(predicted, observationsT);
+
+    #if(true) // DEBUGGING 
+      cout<<"Predicted IDs: ";
+      printIDs(predicted);
+      cout<<"Oberved IDs: ";
+      printIDs(observations);
+    #endif
   
     #if (true) // CASE_A_a
     // Update i.weight
@@ -551,4 +558,15 @@ void ParticleFilter::printParticles(std::ofstream &outfile) {
     outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     outfile<<"]; W = "<< particles[i].weight<<endl;
   }
+}
+
+void ParticleFilter::printIDs(vector<LandmarkObs> landmarks) {
+  cout<<"[";
+  for (int i = 0; i < landmarks.size(); ++i) {
+    cout<<landmarks[i].id;
+    if (i < (landmarks.size()-1)) {
+      cout<<", ";
+    }
+  }
+  cout<<"]"<<endl;
 }
