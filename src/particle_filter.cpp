@@ -143,7 +143,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 }
 
 void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted, 
-                                     vector<LandmarkObs>& observations) {
+                                     vector<LandmarkObs>& observations_) {
   /**
    * Computes the nearest neighbor allowing predited landmarks to be associated
    * with multiple observed landmarks. 
@@ -153,7 +153,7 @@ void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted,
   double min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
   int minInd;
   double dist_;
-  for (LandmarkObs &i : observations) {
+  for (LandmarkObs &i : observations_) {
     minInd = -1;
     for(int j = 0; j < predicted.size(); ++j) {
       dist_ = dist(i.x,i.y,predicted[j].x,predicted[j].y);
@@ -162,6 +162,11 @@ void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted,
         minInd = j; 
       }
     }
+    #if(true) // DEBUGGING
+    if (minInd == -1) {
+      cout << "distance calculation error, index still -1"<<endl;
+    }
+    #endif
     i.id = predicted[minInd].id;
   }                                   
 }
@@ -404,6 +409,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
   #if(true)
   cout<<"Observations Size"<<observationsT.size()<<endl;
+  cout<<"Obervations Original IDs: ";
+  printIDs(observations);
+  cout<<"ObservationsT Copied IDs: ";
+  printIDs(observationsT);
   int i_c = 0;
   #endif
 
@@ -435,7 +444,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     }
 
     // Debuging 
-    #if (true)
+    #if (false)
     cout<<"Pred Size, particle "<<i_c<<": "<< observationsT.size()<<endl;
     #endif
 
@@ -443,10 +452,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     dataAssociation(predicted, observationsT);
 
     #if(true) // DEBUGGING 
-      cout<<"Predicted IDs: ";
-      printIDs(predicted);
-      cout<<"Oberved IDs: ";
-      printIDs(observations);
+      if ((i_c+1)%10 == 0) {
+        cout<<"Predicted IDs: ";
+        printIDs(predicted);
+        cout<<"Oberved IDs: ";
+        printIDs(observationsT);
+      }
     #endif
   
     #if (true) // CASE_A_a
