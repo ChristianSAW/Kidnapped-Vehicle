@@ -109,7 +109,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   
   // initializations:
   double Xf, Yf, Thetaf;
-  int j = 0;
+  //int j = 0;
   std::default_random_engine gen;           // random generator
   
   // Prediction step for each particle i in particles
@@ -210,11 +210,11 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   // predictions.size() < observations.size().  
 
   // Cases Related to updating weights
-  bool CASE_1 = false;
-  bool CASE_A = true;
-  bool CASE_A_a = true;    
-  bool CASE_A_b = false;
-  bool CASE_B = false;
+  //bool CASE_1 = false;
+  //bool CASE_A = true;
+  //bool CASE_A_a = true;    
+  //bool CASE_A_b = false;
+  //bool CASE_B = false;
 
   #if (false) // CASE_1
   nearestNeighbor_singleAss(predicted, observations);
@@ -358,11 +358,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   // [2] std_landmark = [sig_x, sig_y]
 
   // Cases Related to updating weights
-  bool CASE_1 = false;
-  bool CASE_A = true;
-  bool CASE_A_a = true;    
-  bool CASE_A_b = false;
-  bool CASE_B = false;
+  //bool CASE_1 = false;
+  //bool CASE_A = true;
+  //bool CASE_A_a = true;    
+  //bool CASE_A_b = false;
+  //bool CASE_B = false;
   
   #if (false) // CASE_1
   // Variables
@@ -499,7 +499,7 @@ void ParticleFilter::resample() {
 
   // get all of the current weights
   vector<double> weights;
-  for (unsigned int i = 0; i < num_particles; i++) {
+  for (int i = 0; i < num_particles; i++) {
     weights.push_back(particles[i].weight);
   }
   default_random_engine gen;
@@ -517,7 +517,7 @@ void ParticleFilter::resample() {
   double beta = 0.0;
 
   // resample
-  for (unsigned int i = 0; i < num_particles; i++) {
+  for (int i = 0; i < num_particles; i++) {
     beta += unirealdist(gen) * 2.0;
     while (beta > weights[index]) {
       beta -= weights[index];
