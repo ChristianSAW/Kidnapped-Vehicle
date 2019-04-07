@@ -56,7 +56,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   
   // POPULATE PARTICLES VECTOR
   // Determine later if we want to normalize weights
-  for(int i = 0; i < num_particles; ++i) {
+  for(unsigned int i = 0; i < num_particles; ++i) {
     Particle p; 
     p.id = i;
     p.x = dist_x(gen);
@@ -75,7 +75,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   cout<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
   int n = 10; // must be less than num_particles
   cout<<"Printing First "<<n<<" particles"<<endl;
-  for(int i = 0; (i < num_particles) && (i < n); ++i) {
+  for(unsigned int i = 0; (i < num_particles) && (i < n); ++i) {
     cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     cout<<"]; W = "<< particles[i].weight<<endl;
   }
@@ -87,7 +87,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   outfile<<"Number of particles: "<< particles.size() <<endl;
   outfile<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
   outfile<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
-  for(int i = 0; i < num_particles; ++i) {
+  for(unsigned int i = 0; i < num_particles; ++i) {
     outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     outfile<<"]; W = "<< particles[i].weight<<endl;
   }
@@ -155,7 +155,7 @@ void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted,
   double dist_;
   for (LandmarkObs &i : observations_) {
     minInd = -1;
-    for(int j = 0; j < predicted.size(); ++j) {
+    for(unsigned int j = 0; j < predicted.size(); ++j) {
       dist_ = dist(i.x,i.y,predicted[j].x,predicted[j].y);
       if ( dist_ < min_dist) {
         min_dist = dist_;
@@ -268,7 +268,7 @@ double ParticleFilter::calcWeightSameSize(double std_landmark[],
     W = 1;
     
     // [3] Loop Through each observation, prediction pair and calculate prob + update product sum
-    for( int j = 0; j < observationsT.size(); ++j) {
+    for(unsigned int j = 0; j < observationsT.size(); ++j) {
       Xob = observationsT[j].x;
       Yob = observationsT[j].y;
       Xpr = predicted[j].x;
@@ -310,10 +310,10 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
   W = 1;
 
   // [2] Loop Through each observation, prediction pair and calculate prob + update product sum
-  for( int j = 0; j < observationsT.size(); ++j) {
+  for(unsigned int j = 0; j < observationsT.size(); ++j) {
     match = 0;
     // [3] find prediction observation id match.
-    for (int k = 0; k < predicted.size(); ++k) {
+    for (unsigned int k = 0; k < predicted.size(); ++k) {
       if (observationsT[j].id == predicted[k].id) {
         Xpr = predicted[j].x;
         Ypr = predicted[j].y;
@@ -380,7 +380,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     // Calculate prediction vector 
     predicted.clear();
     // Populate predictions in increasing landmark iD order (Transform Global -> Robot)
-    for(int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
+    for(unsigned int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
       Xr = cos(i.theta)*i.x + sin(i.theta)*i.y + map_landmarks.landmark_list[j].x_f;
       Yr = cos(i.theta)*i.y - sin(i.theta)*i.x + map_landmarks.landmark_list[j].y_f;
       
@@ -422,7 +422,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     predicted.clear();
 
     // Populate prediction vector 
-    for(int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
+    for(unsigned int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
       ml_x = map_landmarks.landmark_list[j].x_f;
       ml_y = map_landmarks.landmark_list[j].y_f;
       
@@ -494,7 +494,7 @@ void ParticleFilter::resample() {
 
   // get all of the current weights
   vector<double> weights;
-  for (int i = 0; i < num_particles; i++) {
+  for (unsigned int i = 0; i < num_particles; i++) {
     weights.push_back(particles[i].weight);
   }
   default_random_engine gen;
@@ -512,7 +512,7 @@ void ParticleFilter::resample() {
   double beta = 0.0;
 
   // resample
-  for (int i = 0; i < num_particles; i++) {
+  for (unsigned int i = 0; i < num_particles; i++) {
     beta += unirealdist(gen) * 2.0;
     while (beta > weights[index]) {
       beta -= weights[index];
@@ -565,7 +565,7 @@ string ParticleFilter::getSenseCoord(Particle best, string coord) {
 }
 
 void ParticleFilter::printParticles(std::ofstream &outfile) {
-  for(int i = 0; i < particles.size(); ++i) {
+  for(unsigned int i = 0; i < particles.size(); ++i) {
     outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
     outfile<<"]; W = "<< particles[i].weight<<endl;
   }
@@ -573,7 +573,7 @@ void ParticleFilter::printParticles(std::ofstream &outfile) {
 
 void ParticleFilter::printIDs(vector<LandmarkObs> landmarks) {
   cout<<"[";
-  for (int i = 0; i < landmarks.size(); ++i) {
+  for (unsigned int i = 0; i < landmarks.size(); ++i) {
     cout<<landmarks[i].id;
     if (i < (landmarks.size()-1)) {
       cout<<", ";

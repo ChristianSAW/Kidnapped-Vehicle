@@ -135,7 +135,7 @@ int main() {
           std::istream_iterator<float>(),
           std::back_inserter(y_sense));
 
-          for (int i = 0; i < x_sense.size(); ++i) {
+          for (unsigned int i = 0; i < x_sense.size(); ++i) {
             LandmarkObs obs;
             obs.x = x_sense[i];
             obs.y = y_sense[i];
@@ -153,7 +153,7 @@ int main() {
           double highest_weight = -1.0;
           Particle best_particle;
           double weight_sum = 0.0;
-          for (int i = 0; i < num_particles; ++i) {
+          for (unsigned int i = 0; i < num_particles; ++i) {
             if (particles[i].weight > highest_weight) {
               highest_weight = particles[i].weight;
               best_particle = particles[i];
