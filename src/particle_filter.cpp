@@ -149,12 +149,14 @@ void ParticleFilter::nearestNeighbor_multiAss(vector<LandmarkObs> predicted,
    * with multiple observed landmarks. 
    * Note: predicted.size() can be <, >, = observations.size(); 
    */
-
-  double min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
+  
+  double min_dist; 
   int minInd;
   double dist_;
+  //cout<<min_dist<<endl; //debugging
   for (LandmarkObs &i : observations_) {
     minInd = -1;
+    min_dist = numeric_limits<double>::max(); // initialize min_dist to max possible val
     for(unsigned int j = 0; j < predicted.size(); ++j) {
       dist_ = dist(i.x,i.y,predicted[j].x,predicted[j].y);
       if ( dist_ < min_dist) {
@@ -215,6 +217,15 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   //bool CASE_A_a = true;    
   //bool CASE_A_b = false;
   //bool CASE_B = false;
+  
+  #if(false)
+      if (1) {
+        cout<<"Predicted Vector:"<<endl;
+        printObs(predicted);
+        cout<<"Observed Vector:"<<endl;
+        printObs(observations);
+      }
+  #endif
 
   #if (false) // CASE_1
   nearestNeighbor_singleAss(predicted, observations);
@@ -224,6 +235,7 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   nearestNeighbor_multiAss(predicted, observations);
   #endif
   #if (false) // CASE_A_b
+  //cout<<"PREPROCESSOR DIRECTIVE FAILURE"<<endl; //DEBUGGING
   // Check size:
   if (predicted.size() < observations.size()) {
     nearestNeighbor_multiAss(predicted, observations);
@@ -307,7 +319,7 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
   
   // Calculate weight as product sum of probability for each measurement pair (Z*,Z)
   // [1] Assign initial value to variable W
-  W = 1;
+  W = 1.0;
 
   // [2] Loop Through each observation, prediction pair and calculate prob + update product sum
   for(unsigned int j = 0; j < observationsT.size(); ++j) {
@@ -321,7 +333,7 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
       }
     }
     if (match == 0) {
-      //cout << "Error, Could not match observation " << j << "with a prediction."<<endl;
+      cout << "Error, Could not match observation " << j << "with a prediction."<<endl;
       Xpr = predicted[0].x;
       Ypr = predicted[0].y;
     }
@@ -331,8 +343,10 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
     delY2 = pow((Yob-Ypr),2);
     
     Prob = (1/(2*M_PI*SigX*SigY))*exp(-((delX2/(2*varX))+(delY2/(2*varY))));
+    //(1/(2*M_PI*s_x*s_y)) * exp(-(pow(pre_x-obs_x,2)/(2*var_x)+(pow(pre_y - obs_y,2)/(2*var_y))));
     W = W*Prob;
   }
+  //W = 5;
   return W;
 }
 
@@ -406,14 +420,16 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   double Xr, Yr;
   double ml_x, ml_y;
   vector<LandmarkObs> observationsT = observations; 
-
   #if(true)
+    int i_c = 0; 
+  #endif
+  
+  #if(false)
   cout<<"Observations Size"<<observationsT.size()<<endl;
   cout<<"Obervations Original IDs: ";
   printIDs(observations);
   cout<<"ObservationsT Copied IDs: ";
   printIDs(observationsT);
-  int i_c = 0;
   #endif
 
   for(Particle &i : particles) {
@@ -448,15 +464,19 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     cout<<"Pred Size, particle "<<i_c<<": "<< observationsT.size()<<endl;
     #endif
 
-    #if(true)
-      cout<<"Particle "<<i_c<<" predicted vector:"<<endl;
-      printObs(predicted);
+    #if(false)
+      if ((i_c+1)%10 == 0) {
+        cout<<"Particle "<<i_c<<" predicted vector:"<<endl;
+        printObs(predicted);
+        cout<<"Observed Vector:"<<endl;
+        printObs(observationsT);
+      }
     #endif
 
     // Calculate dataAssociation between prediction and observation vector
     dataAssociation(predicted, observationsT);
 
-    #if(true) // DEBUGGING 
+    #if(false) // DEBUGGING 
       if ((i_c+1)%10 == 0) {
         cout<<"Predicted IDs: ";
         printIDs(predicted);
@@ -484,6 +504,18 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     ++i_c;
     #endif
   }
+  #endif
+  
+  #if(true)
+    cout<<"Particles, weights after updating:"<<endl;
+    cout<<"[";
+    for (int i = 0; i < num_particles; ++i) {
+      cout<<"("<<i<<" : "<<particles[i].weight<<")";  
+      if (i < (num_particles-1)) {
+        cout<<", ";
+      }
+    }
+    cout<<"]"<<endl;
   #endif
 }
 
