@@ -179,6 +179,8 @@ class ParticleFilter {
   void printParticles(std::ofstream &outfile);
   void printIDs(std::vector<LandmarkObs> landmarks);
   void printObs(std::vector<LandmarkObs> landmarks);
+  void printInit(double x, double y, double theta, double std[]);
+  void printPartW();
   void updateWeightsTS(double sensor_range, double std_landmark[],
 		                   const std::vector<LandmarkObs> &observations, 
                        const Map &map_landmarks);
