@@ -320,8 +320,8 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
     // [3] find prediction observation id match.
     for (unsigned int k = 0; k < predicted.size(); ++k) {
       if (observationsT[j].id == predicted[k].id) {
-        Xpr = predicted[j].x;
-        Ypr = predicted[j].y;
+        Xpr = predicted[k].x;
+        Ypr = predicted[k].y;
         match = 1;
       }
     }
@@ -467,7 +467,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
           cout<<"Predicted IDs: ";
           printIDs(predicted);
           cout<<"Oberved IDs: ";
-          printIDs(observationsT);
+          printIDs(transformed_obs);
         }
       #endif
     
@@ -496,7 +496,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     updateWeightsTS(sensor_range, std_landmark, observations, map_landmarks);
   #endif
   
-  #if(true)
+  #if(false)
     cout<<"Particles, weights after updating:"<<endl;
     cout<<"[";
     for (int i = 0; i < num_particles; ++i) {
