@@ -93,14 +93,14 @@ int main() {
             double previous_velocity = std::stod(j[1]["previous_velocity"].get<string>());
             double previous_yawrate = std::stod(j[1]["previous_yawrate"].get<string>());
             
-            #if(true)
+            #if(false)
             cout<<"Calling Predict Step"<<endl;
             #endif
             pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
           }
 
           // Debugging
-          #if(true)
+          #if(false)
           if ((timeSTP+1)%10 == 0) {
             std::ofstream outfile;
             //outfile.open(path1,ios::out | ios::app | ios::binary);
