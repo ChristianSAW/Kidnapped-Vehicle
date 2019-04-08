@@ -210,13 +210,6 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   // [CASE A_a]: Predictions can be associated with more than 1 observation
   // [CASE A_b]: Predictions can be associated with more than 1 observation iff 
   // predictions.size() < observations.size().  
-
-  // Cases Related to updating weights
-  //bool CASE_1 = false;
-  //bool CASE_A = true;
-  //bool CASE_A_a = true;    
-  //bool CASE_A_b = false;
-  //bool CASE_B = false;
   
   #if(false)
       if (1) {
@@ -228,21 +221,21 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   #endif
 
   #if (false) // CASE_1
-  nearestNeighbor_singleAss(predicted, observations);
+    nearestNeighbor_singleAss(predicted, observations);
   #endif
   #if (true) // CASE_A
-  #if (true) // CASE_A_a
-  nearestNeighbor_multiAss(predicted, observations);
-  #endif
-  #if (false) // CASE_A_b
-  //cout<<"PREPROCESSOR DIRECTIVE FAILURE"<<endl; //DEBUGGING
-  // Check size:
-  if (predicted.size() < observations.size()) {
-    nearestNeighbor_multiAss(predicted, observations);
-  } else { // predicted.size() >= observations.size()
-    nearestNeighbor_singleAss(predicted, observations);
-  }
-  #endif 
+    #if (true) // CASE_A_a
+      nearestNeighbor_multiAss(predicted, observations);
+    #endif
+    #if (false) // CASE_A_b
+      //cout<<"PREPROCESSOR DIRECTIVE FAILURE"<<endl; //DEBUGGING
+      // Check size:
+      if (predicted.size() < observations.size()) {
+        nearestNeighbor_multiAss(predicted, observations);
+      } else { // predicted.size() >= observations.size()
+        nearestNeighbor_singleAss(predicted, observations);
+      }
+    #endif 
   #endif
   
 }
@@ -370,143 +363,136 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   // [1] map has landmarks in order of id, so no need to sort landmarks in prediction vector by 
   // id as you populate in order of increasing id. Only need to sort observations vector.
   // [2] std_landmark = [sig_x, sig_y]
-
-  // Cases Related to updating weights
-  //bool CASE_1 = false;
-  //bool CASE_A = true;
-  //bool CASE_A_a = true;    
-  //bool CASE_A_b = false;
-  //bool CASE_B = false;
   
   #if (false) // CASE_1
-  // Variables
-  vector<LandmarkObs> predicted;
-  double Xr, Yr;
-  
-  // need to make a copy of observations so we can modify it. 
-  // alternatively, we could 1) change dataAssociation to change predicted and not observations id.
-  // Problem is that we cant output anything so we have to change observations. 
-  // 2) swich predicted and observations input into dataAssociation.
-  vector<LandmarkObs> observationsT = observations; 
-
-  // updating weight for each particle
-  for(Particle &i : particles) {
-    // Calculate prediction vector 
-    predicted.clear();
-    // Populate predictions in increasing landmark iD order (Transform Global -> Robot)
-    for(unsigned int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
-      Xr = cos(i.theta)*i.x + sin(i.theta)*i.y + map_landmarks.landmark_list[j].x_f;
-      Yr = cos(i.theta)*i.y - sin(i.theta)*i.x + map_landmarks.landmark_list[j].y_f;
-      
-      LandmarkObs lm;
-      lm.id = map_landmarks.landmark_list[j].id_i;
-      lm.x = Xr;
-      lm.y = Yr;
-      
-      predicted.push_back(lm);
-    }
+    // Variables
+    vector<LandmarkObs> predicted;
+    double Xr, Yr;
     
-    // Calculate dataAssociation between prediction and observation vector
-    dataAssociation(predicted, observationsT);
-    
-    // Update i.weight
-    i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
-  }
-  #endif
-  
-  #if (false) // CASE_A
-  // Variables
-  vector<LandmarkObs> predicted;
-  double Xr, Yr;
-  double ml_x, ml_y;
-  vector<LandmarkObs> observationsT = observations; 
-  #if(true)
-    int i_c = 0; 
-  #endif
-  
-  #if(false)
-  cout<<"Observations Size"<<observationsT.size()<<endl;
-  cout<<"Obervations Original IDs: ";
-  printIDs(observations);
-  cout<<"ObservationsT Copied IDs: ";
-  printIDs(observationsT);
-  #endif
+    // need to make a copy of observations so we can modify it. 
+    // alternatively, we could 1) change dataAssociation to change predicted and not observations id.
+    // Problem is that we cant output anything so we have to change observations. 
+    // 2) swich predicted and observations input into dataAssociation.
+    vector<LandmarkObs> observationsT = observations; 
 
-  for(Particle &i : particles) {
-    
-    // Calculate prediction vector 
-    predicted.clear();
-
-    // Populate prediction vector 
-    for(unsigned int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
-      ml_x = map_landmarks.landmark_list[j].x_f;
-      ml_y = map_landmarks.landmark_list[j].y_f;
-      
-      // [1] Check if landmark is in range 
-      if (fabs(ml_x-i.x) <= sensor_range && fabs(ml_y - i.y) <= sensor_range) {
-        
-        // [2] Convert landmark to local frame 
+    // updating weight for each particle
+    for(Particle &i : particles) {
+      // Calculate prediction vector 
+      predicted.clear();
+      // Populate predictions in increasing landmark iD order (Transform Global -> Robot)
+      for(unsigned int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
         Xr = cos(i.theta)*i.x + sin(i.theta)*i.y + map_landmarks.landmark_list[j].x_f;
         Yr = cos(i.theta)*i.y - sin(i.theta)*i.x + map_landmarks.landmark_list[j].y_f;
         
-        // [3] Add landmark to predicted vector
         LandmarkObs lm;
         lm.id = map_landmarks.landmark_list[j].id_i;
         lm.x = Xr;
         lm.y = Yr;
-      
+        
         predicted.push_back(lm);
       }
+      
+      // Calculate dataAssociation between prediction and observation vector
+      dataAssociation(predicted, observationsT);
+      
+      // Update i.weight
+      i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
     }
-
-    // Debuging 
-    #if (false)
-    cout<<"Pred Size, particle "<<i_c<<": "<< observationsT.size()<<endl;
-    #endif
-
-    #if(false)
-      if ((i_c+1)%10 == 0) {
-        cout<<"Particle "<<i_c<<" predicted vector:"<<endl;
-        printObs(predicted);
-        cout<<"Observed Vector:"<<endl;
-        printObs(observationsT);
-      }
-    #endif
-
-    // Calculate dataAssociation between prediction and observation vector
-    dataAssociation(predicted, observationsT);
-
-    #if(false) // DEBUGGING 
-      if ((i_c+1)%10 == 0) {
-        cout<<"Predicted IDs: ";
-        printIDs(predicted);
-        cout<<"Oberved IDs: ";
-        printIDs(observationsT);
-      }
+  #endif
+  
+  #if (true) // CASE_A
+    // Variables
+    vector<LandmarkObs> predicted;
+    vector<LandmarkObs> transformed_obs;
+    double Xr, Yr;
+    double ml_x, ml_y;
+    int ml_id;
+    //vector<LandmarkObs> observationsT = observations; 
+    #if(true)
+      int i_c = 0; 
     #endif
   
-    #if (true) // CASE_A_a
-    // Update i.weight
-    i.weight = calcWeightDiffSize(std_landmark,observationsT,predicted);
+    #if(false)
+      cout<<"Observations Size"<<observationsT.size()<<endl;
+      cout<<"Obervations Original IDs: ";
+      printIDs(observations);
+      cout<<"ObservationsT Copied IDs: ";
+      printIDs(observationsT);
     #endif
 
-    #if (false) // CASE_A_b
-    if (predicted.size() == observationsT.size()) {
-      // CASE 1;
-      i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
-    } else {
-      // CASE A_a:
-      i.weight = calcWeightDiffSize(std_landmark, observationsT, predicted);
+    for(Particle &i : particles) {
+      
+      // CREATE AND POPULATE Predicted & Observation Vectors
+      predicted.clear();
+      transformed_obs.clear();
+       
+      // [1] populate predicted vector from map landmark positions. 
+      for (unsigned int j=0; j < map_landmarks.landmark_list.size(); j++){
+          ml_x = map_landmarks.landmark_list[j].x_f;
+          ml_y = map_landmarks.landmark_list[j].y_f;
+          ml_id = map_landmarks.landmark_list[j].id_i;
+
+          // [2] Check if landmark is in range (use rectangular region).
+          if (fabs(ml_x - i.x) <= sensor_range && fabs(ml_y - i.y) <= sensor_range){
+              predicted.push_back(LandmarkObs{ml_id, ml_x, ml_y});
+          }
+      }
+      // [3] Populate transformed_obs vector [local to global coordinates]
+      vector<LandmarkObs> transformed_obs;
+      for (unsigned int j=0; j < observations.size(); j++){
+          double t_x = cos(i.theta)*observations[j].x - sin(i.theta)*observations[j].y + i.x;
+          double t_y = sin(i.theta)*observations[j].x + cos(i.theta)*observations[j].y + i.y;
+          transformed_obs.push_back(LandmarkObs{observations[j].id, t_x, t_y});
+      }
+
+      // Debuging 
+      #if (false)
+      cout<<"Pred Size, particle "<<i_c<<": "<< observationsT.size()<<endl;
+      #endif
+
+      #if(false)
+        if ((i_c+1)%10 == 0) {
+          cout<<"Particle "<<i_c<<" predicted vector:"<<endl;
+          printObs(predicted);
+          cout<<"Observed Vector:"<<endl;
+          printObs(observationsT);
+        }
+      #endif
+
+      // Calculate dataAssociation between prediction and observation vector
+      dataAssociation(predicted, transformed_obs);
+
+      #if(false) // DEBUGGING 
+        if ((i_c+1)%10 == 0) {
+          cout<<"Predicted IDs: ";
+          printIDs(predicted);
+          cout<<"Oberved IDs: ";
+          printIDs(observationsT);
+        }
+      #endif
+    
+      #if (true) // CASE_A_a
+      // Update i.weight
+      i.weight = calcWeightDiffSize(std_landmark,transformed_obs,predicted);
+      #endif
+
+      #if (false) // CASE_A_b
+      if (predicted.size() == observationsT.size()) {
+        // CASE 1;
+        i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
+      } else {
+        // CASE A_a:
+        i.weight = calcWeightDiffSize(std_landmark, observationsT, predicted);
+      }
+      #endif
+
+      #if(true)
+      ++i_c;
+      #endif
     }
-    #endif
-
-    #if(true)
-    ++i_c;
-    #endif
-  }
   #endif
 
-  #if (true) // CASE_B
+  #if (false) // CASE_B
     updateWeightsTS(sensor_range, std_landmark, observations, map_landmarks);
   #endif
   
