@@ -404,7 +404,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     // Variables
     vector<LandmarkObs> predicted;
     vector<LandmarkObs> transformed_obs;
-    double Xr, Yr;
     double ml_x, ml_y;
     int ml_id;
     //vector<LandmarkObs> observationsT = observations; 
