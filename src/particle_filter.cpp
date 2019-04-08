@@ -45,9 +45,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   num_particles = 100;  // TODO: Set the number of particles
   
   weights.resize(num_particles);
-  
-  //particles.clear();
-  
+    
   // std = [sig_x, sig_y, sig_theta]
   std::default_random_engine gen;           // random generator
   normal_distribution<double> dist_x(x, std[0]);
@@ -68,30 +66,8 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   is_initialized = true;
   
 
-  #if (true) // Debugging
-  cout<<"Initialized Particles"<<endl;
-  cout<<"Number of particles: "<< particles.size() <<endl;
-  cout<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
-  cout<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
-  int n = 10; // must be less than num_particles
-  cout<<"Printing First "<<n<<" particles"<<endl;
-  for(int i = 0; (i < num_particles) && (i < n); ++i) {
-    cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
-    cout<<"]; W = "<< particles[i].weight<<endl;
-  }
-  // Add Particles to 'initialization.txt' file
-  // create an open file
-  ofstream outfile("/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/initialized_particles.txt");    
-  // populate initialization.txt
-  outfile<<"Initialized Particles"<<endl;
-  outfile<<"Number of particles: "<< particles.size() <<endl;
-  outfile<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
-  outfile<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
-  for(int i = 0; i < num_particles; ++i) {
-    outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
-    outfile<<"]; W = "<< particles[i].weight<<endl;
-  }
-  outfile.close();
+  #if (false) // Debugging
+    printInit(x, y, thta, std);
   #endif
   
 }
@@ -211,15 +187,6 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
   // [CASE A_b]: Predictions can be associated with more than 1 observation iff 
   // predictions.size() < observations.size().  
   
-  #if(false)
-      if (1) {
-        cout<<"Predicted Vector:"<<endl;
-        printObs(predicted);
-        cout<<"Observed Vector:"<<endl;
-        printObs(observations);
-      }
-  #endif
-
   #if (false) // CASE_1
     nearestNeighbor_singleAss(predicted, observations);
   #endif
@@ -278,16 +245,14 @@ double ParticleFilter::calcWeightSameSize(double std_landmark[],
       Yob = observationsT[j].y;
       Xpr = predicted[j].x;
       Ypr = predicted[j].y;      
+      
+      // Calculate probability
       delX2 = pow((Xob-Xpr),2);
       delY2 = pow((Yob-Ypr),2);
-
-      //Prob = (1/(2*M_PI*SigX*SigY))*exp(-(((Xob-Xpr)*(Xob-Xpr)/(2*SigX*SigX))+((Yob-Ypr)*(Yob-Ypr)/(2*SigY*SigY))));
       Prob = (1/(2*M_PI*SigX*SigY))*exp(-((delX2/(2*varX))+(delY2/(2*varY))));
       W = W*Prob;
     }
-    
-    return W;
-
+  return W;
 }
 
 double ParticleFilter::calcWeightDiffSize(double std_landmark[],
@@ -317,6 +282,9 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
   // [2] Loop Through each observation, prediction pair and calculate prob + update product sum
   for(unsigned int j = 0; j < observationsT.size(); ++j) {
     match = 0;
+    Xob = observationsT[j].x;
+    Yob = observationsT[j].y;
+
     // [3] find prediction observation id match.
     for (unsigned int k = 0; k < predicted.size(); ++k) {
       if (observationsT[j].id == predicted[k].id) {
@@ -330,16 +298,13 @@ double ParticleFilter::calcWeightDiffSize(double std_landmark[],
       Xpr = predicted[0].x;
       Ypr = predicted[0].y;
     }
-    Xob = observationsT[j].x;
-    Yob = observationsT[j].y;
+    
+    // [4] Calcule probability
     delX2 = pow((Xob-Xpr),2);
     delY2 = pow((Yob-Ypr),2);
-    
     Prob = (1/(2*M_PI*SigX*SigY))*exp(-((delX2/(2*varX))+(delY2/(2*varY))));
-    //(1/(2*M_PI*s_x*s_y)) * exp(-(pow(pre_x-obs_x,2)/(2*var_x)+(pow(pre_y - obs_y,2)/(2*var_y))));
     W = W*Prob;
   }
-  //W = 5;
   return W;
 }
 
@@ -363,6 +328,14 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   // [1] map has landmarks in order of id, so no need to sort landmarks in prediction vector by 
   // id as you populate in order of increasing id. Only need to sort observations vector.
   // [2] std_landmark = [sig_x, sig_y]
+
+  // [CASE 1]: Number of observations always equals number of predicted landmarks +
+  // Observations & Predictions are in local frame. 
+  // Reqires predictions.size() = observations.size().
+  // [CASE A]: Observations & Predictions are in global frame.
+  // [CASE A_a]: Predictions can be associated with more than 1 observation
+  // [CASE A_b]: Predictions can be associated with more than 1 observation iff 
+  // predictions.size() < observations.size().  
   
   #if (false) // CASE_1
     // Variables
@@ -407,19 +380,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     double Xr, Yr;
     double ml_x, ml_y;
     int ml_id;
-    //vector<LandmarkObs> observationsT = observations; 
-    #if(true)
+    #if(false) // DEBUGGING
       int i_c = 0; 
     #endif
   
-    #if(false)
-      cout<<"Observations Size"<<observationsT.size()<<endl;
-      cout<<"Obervations Original IDs: ";
-      printIDs(observations);
-      cout<<"ObservationsT Copied IDs: ";
-      printIDs(observationsT);
-    #endif
-
     for(Particle &i : particles) {
       
       // CREATE AND POPULATE Predicted & Observation Vectors
@@ -445,67 +409,37 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
           transformed_obs.push_back(LandmarkObs{observations[j].id, t_x, t_y});
       }
 
-      // Debuging 
-      #if (false)
-      cout<<"Pred Size, particle "<<i_c<<": "<< observationsT.size()<<endl;
-      #endif
-
-      #if(false)
-        if ((i_c+1)%10 == 0) {
-          cout<<"Particle "<<i_c<<" predicted vector:"<<endl;
-          printObs(predicted);
-          cout<<"Observed Vector:"<<endl;
-          printObs(observationsT);
-        }
-      #endif
-
       // Calculate dataAssociation between prediction and observation vector
       dataAssociation(predicted, transformed_obs);
-
-      #if(false) // DEBUGGING 
-        if ((i_c+1)%10 == 0) {
-          cout<<"Predicted IDs: ";
-          printIDs(predicted);
-          cout<<"Oberved IDs: ";
-          printIDs(transformed_obs);
-        }
-      #endif
     
       #if (true) // CASE_A_a
-      // Update i.weight
-      i.weight = calcWeightDiffSize(std_landmark,transformed_obs,predicted);
+        // Update i.weight
+        i.weight = calcWeightDiffSize(std_landmark,transformed_obs,predicted);
       #endif
 
       #if (false) // CASE_A_b
-      if (predicted.size() == observationsT.size()) {
-        // CASE 1;
-        i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
-      } else {
-        // CASE A_a:
-        i.weight = calcWeightDiffSize(std_landmark, observationsT, predicted);
-      }
+        if (predicted.size() == observationsT.size()) {
+          // CASE 1;
+          i.weight = calcWeightSameSize(std_landmark, observationsT, predicted);
+        } else {
+          // CASE A_a:
+          i.weight = calcWeightDiffSize(std_landmark, observationsT, predicted);
+        }
       #endif
 
-      #if(true)
-      ++i_c;
+      #if(false) //DEBUGGING
+        ++i_c;
       #endif
     }
   #endif
 
-  #if (false) // CASE_B
+  #if (false) // CONDENSED VERSION OF UPDATE WEIGHTS (READ FOR CLARITY)
     updateWeightsTS(sensor_range, std_landmark, observations, map_landmarks);
   #endif
   
-  #if(false)
+  #if(false) // DEBUGGING
     cout<<"Particles, weights after updating:"<<endl;
-    cout<<"[";
-    for (int i = 0; i < num_particles; ++i) {
-      cout<<"("<<i<<" : "<<particles[i].weight<<")";  
-      if (i < (num_particles-1)) {
-        cout<<", ";
-      }
-    }
-    cout<<"]"<<endl;
+    printPartW();
   #endif
 }
 
@@ -694,3 +628,41 @@ void ParticleFilter::printObs(vector<LandmarkObs> landmarks) {
   }
   cout<<"}"<<endl;
 }
+
+void ParticleFilter::printInit(double x, double y, double theta, double std[]) {
+  cout<<"Initialized Particles"<<endl;
+  cout<<"Number of particles: "<< particles.size() <<endl;
+  cout<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
+  cout<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
+  int n = 10; // must be less than num_particles
+  cout<<"Printing First "<<n<<" particles"<<endl;
+  for(int i = 0; (i < num_particles) && (i < n); ++i) {
+    cout<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
+    cout<<"]; W = "<< particles[i].weight<<endl;
+  }
+  // Add Particles to 'initialization.txt' file
+  // create an open file
+  ofstream outfile("/home/workspace/CarND-Kidnapped-Vehicle-Project/output_files/initialized_particles.txt");    
+  // populate initialization.txt
+  outfile<<"Initialized Particles"<<endl;
+  outfile<<"Number of particles: "<< particles.size() <<endl;
+  outfile<<"GPS: ["<<x<<", "<<y<<", "<<theta<<"]"<<endl;
+  outfile<<"STDEV: ["<<std[0]<<", "<<std[1]<<", "<<std[2]<<"]"<<endl; 
+  for(int i = 0; i < num_particles; ++i) {
+    outfile<<"Particle "<< particles[i].id <<"; ["<<particles[i].x<<", "<<particles[i].y;
+    outfile<<"]; W = "<< particles[i].weight<<endl;
+  }
+  outfile.close();
+}
+
+void ParticleFilter::printPartW() {
+  cout<<"[";
+    for (int i = 0; i < num_particles; ++i) {
+      cout<<"("<<i<<" : "<<particles[i].weight<<")";  
+      if (i < (num_particles-1)) {
+        cout<<", ";
+      }
+    }
+  cout<<"]"<<endl;
+}
+
